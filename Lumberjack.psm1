@@ -48,7 +48,12 @@ CLASS Lumberjack {
 
     Cannibalize ([Lumberjack]$Lumberjack) {$Lumberjack.Logs | ForEach-Object { $this.AddLog($_) }  }
 
-    [Log[]] FilterByTags ([String[]]$Tags) {Return $( $this.Logs | Where-Object {$Tags -in $_.Tags} ) }
+    [Log[]] FilterByTags ([String[]]$Tags) {
+        $set = $this.Logs
+        $filters = Foreach ($t in $Tags) { [ScriptBlock]::Create("'$t' -in `$_.Tags") }
+        Foreach ($f in $filters) {$set = $set | Where-Object $f }
+        Return $set 
+        }<# END [Log[]] FilterByTags ([String[]]$Tags) #>
 
 }
 
